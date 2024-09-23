@@ -6,13 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/zsandibe/online-course-platform/internal/domain"
+	validator "github.com/zsandibe/online-course-platform/pkg/validator"
 )
 
 func (h *Handler) signIn(c *gin.Context) {
 	var inp domain.SignInRequest
 
 	if err := c.ShouldBindJSON(&inp); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid input: %v", err))
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid request body: %v", err))
 		return
 	}
 }
@@ -21,9 +22,16 @@ func (h *Handler) signUp(c *gin.Context) {
 	var inp domain.SignUpRequest
 
 	if err := c.ShouldBindJSON(&inp); err != nil {
-		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid input: %v", err))
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("invalid request body: %v", err))
 		return
 	}
+
+	if err := validator.ValidateSignInRequest(&inp); err != nil {
+		newErrorResponse(c, http.StatusBadRequest, fmt.Errorf("validation error: %v", err))
+		return
+	}
+
+	c.JSON(200, &inp)
 }
 
 func (h *Handler) forgotPassword(c *gin.Context) {
