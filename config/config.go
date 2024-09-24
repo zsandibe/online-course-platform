@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
@@ -12,8 +13,8 @@ import (
 type Config struct {
 	Server   serverConfig
 	Postgres PostgresConfig
-	// Token    tokenConfig
-	Smtp smtpConfig
+	Token    tokenConfig
+	Smtp     smtpConfig
 }
 
 type smtpConfig struct {
@@ -35,11 +36,11 @@ type serverConfig struct {
 	Port string `envconfig:"SERVER_PORT" required:"true"`
 }
 
-// type tokenConfig struct {
-// 	AccessKey       string        `envconfig:"ACCESS_KEY" required:"true"`
-// 	AccessTokenAge  time.Duration `envconfig:"ACCESS_TOKEN_AGE" required:"true"`
-// 	RefreshTokenAge time.Duration `envconfig:"REFRESH_TOKEN_AGE" required:"true"`
-// }
+type tokenConfig struct {
+	SigningKey      string        `envconfig:"SIGNING_KEY" required:"true"`
+	AccessTokenTTL  time.Duration `envconfig:"ACCESS_TOKEN_TTL" required:"true"`
+	RefreshTokenTTL time.Duration `envconfig:"REFRESH_TOKEN_TTL" required:"true"`
+}
 
 func NewConfig(path string) (*Config, error) {
 	if err := godotenv.Load(path); err != nil {

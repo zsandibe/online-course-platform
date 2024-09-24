@@ -30,7 +30,7 @@ type Repository struct {
 
 func NewPostgresRepository(db *sqlx.DB) *Repository {
 	return &Repository{
-		UserRepository:    postgres.NewAuthPostgres(db),
+		UserRepository:    postgres.NewUserPostgres(db),
 		CourseRepository:  postgres.NewCoursePostgres(db),
 		QuizRepository:    postgres.NewQuizPostgres(db),
 		LessonRepository:  postgres.NewLessonPostgres(db),
