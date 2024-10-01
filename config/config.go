@@ -15,6 +15,14 @@ type Config struct {
 	Postgres PostgresConfig
 	Token    tokenConfig
 	Smtp     smtpConfig
+	Redis    redisConfig
+	S3       s3Config
+}
+
+type s3Config struct {
+	PartitionId   string `envconfig:"S3_PARTITION_ID" required:"true"`
+	Url           string `envconfig:"S3_URL" required:"true"`
+	SigningRegion string `envconfig:"S3_SIGNING_REGION" required:"true"`
 }
 
 type smtpConfig struct {
@@ -40,6 +48,13 @@ type tokenConfig struct {
 	SigningKey      string        `envconfig:"SIGNING_KEY" required:"true"`
 	AccessTokenTTL  time.Duration `envconfig:"ACCESS_TOKEN_TTL" required:"true"`
 	RefreshTokenTTL time.Duration `envconfig:"REFRESH_TOKEN_TTL" required:"true"`
+}
+
+type redisConfig struct {
+	Host     string `envconfig:"REDIS_HOST" required:"true"`
+	Port     int    `envconfig:"REDIS_PORT" required:"true"`
+	Password string `envconfig:"REDIS_PASSWORD" required:"true"`
+	Db       int    `envconfig:"REDIS_DB" required:"true"`
 }
 
 func NewConfig(path string) (*Config, error) {

@@ -22,10 +22,18 @@ import (
 )
 
 func Start() error {
+	ctx := context.Background()
+
 	cfg, err := config.NewConfig(".env")
 	if err != nil {
 		return fmt.Errorf("config.NewConfig: %v", err)
 	}
+
+	redisClient, err := storage.NewRedisClient(cfg)
+	if err != nil {
+		return fmt.Errorf("storage.NewRedisClient: %v", err)
+	}
+	logger.Info("Redis client loaded successfully")
 
 	db, err := storage.NewPostgresDB(cfg)
 	if err != nil {
@@ -37,6 +45,14 @@ func Start() error {
 	if err = db.MigrateUp(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		logger.Debug(err)
 	}
+	logger.Info("Migrations completed successfully")
+
+	s3, err := storage.NewS3Client(ctx, cfg)
+	if err != nil {
+		return fmt.Errorf("storage.NewS3Client: %v", err)
+	}
+	logger.Info("S3 client loaded successfully")
+	fmt.Println(s3)
 
 	hash := hash.NewHash()
 
@@ -45,9 +61,11 @@ func Start() error {
 		return fmt.Errorf("manager.NewManager: %v", err)
 	}
 
-	repo := repository.NewPostgresRepository(db.DB)
+	postgresRepo := repository.NewPostgresRepository(db.DB)
 
-	svc := service.NewService(repo, tokenManager, hash, cfg.Token.AccessTokenTTL, cfg.Token.RefreshTokenTTL)
+	redisRepo := repository.NewRedisRepository(redisClient)
+
+	svc := service.NewService(postgresRepo, redisRepo, tokenManager, hash, cfg.Token.AccessTokenTTL, cfg.Token.RefreshTokenTTL)
 
 	delivery := v1.NewHandler(svc, tokenManager)
 

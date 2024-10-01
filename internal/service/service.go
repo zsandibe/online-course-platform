@@ -15,8 +15,8 @@ type Service struct {
 	UserSvc UserSvc
 }
 
-func NewService(repo *repository.Repository, tokenManager *manager.Manager, hash *hash.PasswordHasher, accessTokenTTL, refreshTokenTTL time.Duration) *Service {
+func NewService(postgresRepo *repository.Repository, redisRepo *repository.Redis, tokenManager *manager.Manager, hash *hash.PasswordHasher, accessTokenTTL, refreshTokenTTL time.Duration) *Service {
 	return &Service{
-		UserSvc: svc.NewUserService(tokenManager, hash, repo.UserRepository, accessTokenTTL, refreshTokenTTL),
+		UserSvc: svc.NewUserService(tokenManager, hash, redisRepo.RedisRepository, postgresRepo.UserRepository, accessTokenTTL, refreshTokenTTL),
 	}
 }

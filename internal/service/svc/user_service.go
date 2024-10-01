@@ -13,14 +13,15 @@ type UserService struct {
 	refreshTokenTTL time.Duration
 	tokenManager    *manager.Manager
 	hash            *hash.PasswordHasher
-	// redisRepo repository.RedisRepository
-	userRepo repository.UserRepository
+	redisRepo       repository.RedisRepository
+	userRepo        repository.UserRepository
 }
 
-func NewUserService(tokenManager *manager.Manager, hash *hash.PasswordHasher, userRepo repository.UserRepository, accessTokenTTL, refreshTokenTTL time.Duration) *UserService {
+func NewUserService(tokenManager *manager.Manager, hash *hash.PasswordHasher, redisRepo repository.RedisRepository, userRepo repository.UserRepository, accessTokenTTL, refreshTokenTTL time.Duration) *UserService {
 	return &UserService{
 		tokenManager:    tokenManager,
 		hash:            hash,
+		redisRepo:       redisRepo,
 		userRepo:        userRepo,
 		accessTokenTTL:  accessTokenTTL,
 		refreshTokenTTL: refreshTokenTTL,
